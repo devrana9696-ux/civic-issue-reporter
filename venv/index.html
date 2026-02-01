@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Civic Issue Reporter - Smart City Solution</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <i class="fas fa-city"></i>
+                <span>Civic Reporter</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#" class="nav-link active" data-page="citizen">
+                    <i class="fas fa-user"></i> Citizen Portal
+                </a>
+                <a href="#" class="nav-link" data-page="admin">
+                    <i class="fas fa-user-shield"></i> Admin Dashboard
+                </a>
+                <a href="#" class="nav-link" data-page="track">
+                    <i class="fas fa-map-marked-alt"></i> Track Issues
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2><i class="fas fa-sign-in-alt"></i> Admin Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            <p class="hint">Demo credentials: username: <strong>admin</strong>, password: <strong>admin123</strong></p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Citizen Portal Page -->
+        <div id="citizenPage" class="page active">
+            <div class="container">
+                <div class="page-header">
+                    <h1><i class="fas fa-megaphone"></i> Report a Civic Issue</h1>
+                    <p>Help make your city better by reporting civic issues. AI will automatically categorize and route your complaint.</p>
+                </div>
+
+                <div class="grid-2">
+                    <!-- Report Form -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-edit"></i> Issue Details</h2>
+                        </div>
+                        <div class="card-body">
+                            <form id="reportForm">
+                                <div class="form-group">
+                                    <label>Issue Title *</label>
+                                    <input type="text" id="issueTitle" placeholder="Brief description of the issue" required>
+                                    <div id="suggestions" class="suggestions"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Detailed Description *</label>
+                                    <textarea id="issueDescription" rows="4" placeholder="Explain the issue in detail..." required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Location *</label>
+                                    <input type="text" id="issueLocation" placeholder="e.g., SG Highway, Ahmedabad" required>
+                                </div>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Your Name *</label>
+                                        <input type="text" id="reporterName" placeholder="Full name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Contact Number</label>
+                                        <input type="tel" id="reporterContact" placeholder="10-digit number">
+                                    </div>
+                                </div>
+
+                                <div id="aiPrediction" class="ai-prediction" style="display:none;">
+                                    <h3><i class="fas fa-robot"></i> AI Analysis</h3>
+                                    <div class="prediction-grid">
+                                        <div class="prediction-item">
+                                            <span class="label">Category:</span>
+                                            <span id="predictedCategory" class="value"></span>
+                                        </div>
+                                        <div class="prediction-item">
+                                            <span class="label">Severity:</span>
+                                            <span id="predictedSeverity" class="value"></span>
+                                        </div>
+                                        <div class="prediction-item">
+                                            <span class="label">Department:</span>
+                                            <span id="predictedDept" class="value"></span>
+                                        </div>
+                                        <div class="prediction-item">
+                                            <span class="label">Priority:</span>
+                                            <span id="predictedPriority" class="value"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i class="fas fa-paper-plane"></i> Submit Issue
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Recent Issues -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-list"></i> Recent Reports</h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="recentIssues" class="issue-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard Page -->
+        <div id="adminPage" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1><i class="fas fa-chart-line"></i> Admin Dashboard</h1>
+                    <p>Monitor and manage civic issues across the city</p>
+                </div>
+
+                <!-- Analytics Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card stat-total">
+                        <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statTotal">0</div>
+                            <div class="stat-label">Total Issues</div>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-pending">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statPending">0</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-progress">
+                        <div class="stat-icon"><i class="fas fa-spinner"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statProgress">0</div>
+                            <div class="stat-label">In Progress</div>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-resolved">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="statResolved">0</div>
+                            <div class="stat-label">Resolved</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-chart-pie"></i> Issues by Category</h2>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-chart-bar"></i> Severity Distribution</h2>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="severityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Issues Management Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-tasks"></i> Manage Issues</h2>
+                        <div class="filter-group">
+                            <select id="filterStatus" class="filter-select">
+                                <option value="">All Status</option>
+                                <option value="pending">Pending</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="resolved">Resolved</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                            <select id="filterSeverity" class="filter-select">
+                                <option value="">All Severity</option>
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="adminIssuesTable" class="table-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track Issues Page -->
+        <div id="trackPage" class="page">
+            <div class="container">
+                <div class="page-header">
+                    <h1><i class="fas fa-search"></i> Track Your Issue</h1>
+                    <p>View real-time status updates of reported issues</p>
+                </div>
+
+                <div class="grid-2">
+                    <!-- Search/Filter -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-filter"></i> Search Issues</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Issue ID</label>
+                                <input type="number" id="searchIssueId" placeholder="Enter issue ID">
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="searchCategory">
+                                    <option value="">All Categories</option>
+                                    <option value="Road & Infrastructure">Road & Infrastructure</option>
+                                    <option value="Water Supply">Water Supply</option>
+                                    <option value="Electricity">Electricity</option>
+                                    <option value="Garbage & Sanitation">Garbage & Sanitation</option>
+                                    <option value="Public Safety">Public Safety</option>
+                                    <option value="Parks & Environment">Parks & Environment</option>
+                                    <option value="Public Transport">Public Transport</option>
+                                    <option value="Buildings & Housing">Buildings & Housing</option>
+                                </select>
+                            </div>
+                            <button onclick="searchIssues()" class="btn btn-primary btn-block">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Issue Details -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-info-circle"></i> Issue Details</h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="issueDetails" class="issue-details-container">
+                                <p class="text-muted">Select an issue to view details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Issues Map View -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-map"></i> All Issues</h2>
+                    </div>
+                    <div class="card-body">
+                        <div id="allIssues" class="issues-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Issue Detail Modal -->
+    <div id="issueModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Civic Issue Reporter | AI Innovation Challenge | IBM SkillsBuild x CSRBOX</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/static/app.js?v=2"></script>
+
+</body>
+</html>
